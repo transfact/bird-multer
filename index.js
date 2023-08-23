@@ -1,7 +1,7 @@
 const express = require('express');
 const multer =require('multer')
 const aws = require("aws-sdk")
-const multers3= require("multer-sdk")
+const multers3= require("multer-s3")
 const path=require('path')
 const app = express();
 const PORT = 8080;
@@ -28,10 +28,10 @@ const upload = multer({
         bucket: "hwr-bucket",
         acl : "public-read",
         metadata : function(req,file,cb){
-            cb(null,{fieldName: file.fieldName})
+            cb(null,{fieldName: file.fieldname})
         },
         key(req, file, cb) {
-            cb(null, `${Date.now()}_${path.basename(file.originalname)}`) // original 폴더안에다 파일을 저장
+            cb(null, `${Date.now()}-${file.originalname}`) // original 폴더안에다 파일을 저장
          },
     }),
     limits : {
@@ -66,10 +66,10 @@ app.post('/multiAxios',  (req,res)=>{
           console.log(err)
           return;
         }
-       
+        console.log("success :",req.files)
         filePathArray=[]
         for(let i=0; i<req.files.length; i++){
-            filePathArray[i]=req.files[i].path
+            filePathArray[i]=req.files[i].location
         }
         return res.json({
             "filePath" :filePathArray
